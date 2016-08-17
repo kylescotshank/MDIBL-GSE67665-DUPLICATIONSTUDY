@@ -1,1 +1,3 @@
 # MDIBL-GSE67665-DUPLICATIONSTUDY
+
+This is a duplication study for PMID:27241320.

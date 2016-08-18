@@ -20,4 +20,4 @@ Purpose:
  * mart_export.txt
    * This is a file pulled from the Ensembl Biomart to allow for better annotation.
 
-Code is in 'R' with liberal use of 'Bioconductor' packages.
+Code is in `R` with liberal use of `Bioconductor` packages.

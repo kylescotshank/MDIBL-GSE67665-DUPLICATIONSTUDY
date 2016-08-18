@@ -16,6 +16,8 @@ Purpose:
 ####Files 
  * R Script
  * constants.R
- ..* This is a file we use across RegenDB to make sure output is consistent for Microarray studies
+   * This is a file we use across RegenDB to make sure output is consistent for Microarray studies
  * mart_export.txt
- ..* This is a file pulled from the Ensembl Biomart to allow for better annotation.
+   * This is a file pulled from the Ensembl Biomart to allow for better annotation.
+
+Code is in 'R' with liberal use of 'Bioconductor' packages.

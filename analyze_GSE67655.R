@@ -2,6 +2,8 @@
 # Analyzes the GSE67655 microarray experiment.
 # http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE67665
 # 
+# @Author: Kyle Shank - Bioinformatics Training Specialist, 
+#                       MDI Biological Laboratory
 #############################################################
 
 #############################################################
@@ -10,12 +12,12 @@
 
 # How fold changes should be depicted: use -1 if earlier stages first; 1 otherwise.
 pairContrastCoefficient <- -1
+# constants.R is for re-use throughout RegenDB
 source ("./constants.R")
 
 #############################################################
 # Set up dependencies.
 #############################################################
-
 
 # To ensure proper library load, first setRepositories(), then select CRAN, BioC, BioC extra, CRAN (extras)
 # Function to ensure packages always load on native script run:
@@ -61,16 +63,19 @@ file.copy(files,".")
 file.rename(from=list.files(pattern="*.gz"),to=file.newnames)
 
 #############################################################
-# Get necessary brainarray cdf to use with oligo
+# Get necessary brainarray cdf to use with oligo, create local
+# package source to use.
+#
+# only need to run commented-out code the first time through
 #############################################################
 
 
-download.file("http://mbni.org/customcdf/20.0.0/enst.download/zebgene10st_Dr_ENST_20.0.0.zip","tmp.zip")
-unzip("tmp.zip")
-dir()
-z <- cdf2table("zebgene10st_Dr_ENST.cdf")
-seed <- new("GenericPDInfoPkgSeed",table=z,author="Kyle Scot Shank",email="kshank@mdibl.org", species = "Danio Rerio", pkgName = "pd.zebgene10st.dr.ENST.20")
-makePdInfoPackage(seed)
+# download.file("http://mbni.org/customcdf/20.0.0/enst.download/zebgene10st_Dr_ENST_20.0.0.zip","tmp.zip")
+# unzip("tmp.zip")
+# dir()
+# z <- cdf2table("zebgene10st_Dr_ENST.cdf")
+# seed <- new("GenericPDInfoPkgSeed",table=z,author="me",email="me@theinternet.com", species = "Danio Rerio", pkgName = "pd.zebgene10st.dr.ENST.20")
+# makePdInfoPackage(seed)
 install.packages("pd.zebgene10st.dr.ENST.20/",repos=NULL,type="source")
 
 #############################################################
@@ -78,18 +83,20 @@ install.packages("pd.zebgene10st.dr.ENST.20/",repos=NULL,type="source")
 #############################################################
 
 design<- data.frame(Array = sapply(strsplit(file.names, split='_', fixed=TRUE), function(x) (x[1])),
-                     Group = c(rep("CTRL",3),rep("04HR",3),rep("DY01",3),rep("DY03",3),rep("DY07",3),rep("DY14",3),rep("DY90",3)),
+                     Group = c(rep("CTRL",3),rep("4HPI",3),rep("1DPI",3),rep("3DPI",3),rep("7DPI",3),rep("14DPI",3),rep("90DPI",3)),
                      Dye = rep(1,length(file.names)),
                      Sample=seq(1:length(file.names)))
 
 write.table(design,"file.dat")
 
+# Check number of sample groups - should be 7
 (nSampleGroups <- length(unique(design$Group)))
 
 #############################################################
 # Process raw data.
 #############################################################
 # Read all CEL files in cwd in directory, label them, read them in via read.celfiles()
+# pckname is to ensure that latest brainarray version is used
 celFiles <- list.celfiles(".",full.names=TRUE,listGzipped=TRUE)
 celData <- read.celfiles(celFiles,pkgname="pd.zebgene10st.dr.ENST.20")
 
@@ -157,59 +164,59 @@ dev.off()
 #############################################################
 # Calc avg exn values for each gene in each sample in each sample group.
 # Creates vars: (matrix w/ single column) but really a 1-D array: 1 row w/ column for exn value of each gene
-maCtrl <- (celDataExn[, 1] + celDataExn[, 2] + celDataExn[, 3])/3
-ma04HR <- (celDataExn[, 4] + celDataExn[, 5] + celDataExn[, 6])/3
-maDY01 <- (celDataExn[, 7] + celDataExn[, 8] + celDataExn[, 9])/3
-maDY03 <- (celDataExn[, 10] + celDataExn[, 11] + celDataExn[, 12])/3
-maDY07 <- (celDataExn[, 13] + celDataExn[, 14] + celDataExn[, 15])/3
-maDY14 <- (celDataExn[, 16] + celDataExn[, 17] + celDataExn[, 18])/3
-maDY90 <- (celDataExn[, 19] + celDataExn[, 20] + celDataExn[, 21])/3
+maCTRL <- (celDataExn[, 1] + celDataExn[, 2] + celDataExn[, 3])/3
+ma4HPI <- (celDataExn[, 4] + celDataExn[, 5] + celDataExn[, 6])/3
+ma1DPI <- (celDataExn[, 7] + celDataExn[, 8] + celDataExn[, 9])/3
+ma3DPI <- (celDataExn[, 10] + celDataExn[, 11] + celDataExn[, 12])/3
+ma7DPI <- (celDataExn[, 13] + celDataExn[, 14] + celDataExn[, 15])/3
+ma14DPI <- (celDataExn[, 16] + celDataExn[, 17] + celDataExn[, 18])/3
+ma90DPI <- (celDataExn[, 19] + celDataExn[, 20] + celDataExn[, 21])/3
 
 
 # Plots:
 # X: Average values for each gene in the entire array.
 # Y: Fold Change.
 
-# 04HR v ctrl
-X <- (ma04HR + maCtrl)/2
-Y <- (ma04HR - maCtrl)
-png("MAplot_04hr_vs_ctrl.png")
-smoothScatter(X, Y, main="04HR vs Control", xlab="(04HR + CTRL)/2", ylab="(04HR - CTRL)", sub=Sys.time())
+# 4HPI v ctrl
+X <- (ma4HPI + maCTRL)/2
+Y <- (ma4HPI - maCTRL)
+png("MAplot_4HPI_vs_CTRL.png")
+smoothScatter(X, Y, main="4HPI vs Control", xlab="(4HPI + CTRL)/2", ylab="(4HPI - CTRL)", sub=Sys.time())
 dev.off()
 
 
-# DY01 v ctrl
-X <- (maDY01 + maCtrl)/2
-Y <- (maDY01 - maCtrl)
-png("MAplot_DY01_vs_ctrl.png")
-smoothScatter(X, Y, main="DY01 vs Control", xlab="(DY01 + CTRL)/2", ylab="(DY01 - CTRL)", sub=Sys.time())
+# 1DPI v CTRL
+X <- (ma1DPI + maCTRL)/2
+Y <- (ma1DPI - maCTRL)
+png("MAplot_1DPI_vs_CTRL.png")
+smoothScatter(X, Y, main="1DPI vs Control", xlab="(1DPI + CTRL)/2", ylab="(1DPI - CTRL)", sub=Sys.time())
 dev.off()
 
-# DY03 v ctrl
-X <- (maDY03 + maCtrl)/2
-Y <- (maDY03 - maCtrl)
-png("MAplot_DY03_vs_ctrl.png")
-smoothScatter(X, Y, main="DY03 vs Control", xlab="(DY03 + CTRL)/2", ylab="(DY03 - CTRL)", sub=Sys.time())
+# 3DPI v CTRL
+X <- (ma3DPI + maCTRL)/2
+Y <- (ma3DPI - maCTRL)
+png("MAplot_3DPI_vs_CTRL.png")
+smoothScatter(X, Y, main="3DPI vs Control", xlab="(3DPI + CTRL)/2", ylab="(3DPI - CTRL)", sub=Sys.time())
 dev.off()
 
-# DY07 v ctrl
-X <- (maDY07 + maCtrl)/2
-Y <- (maDY07 - maCtrl)
-png("MAplot_DY07_vs_ctrl.png")
-smoothScatter(X, Y, main="DY07 vs Control", xlab="(DY07 + CTRL)/2", ylab="(DY07 - CTRL)", sub=Sys.time())
+# 7DPI v CTRL
+X <- (ma7DPI + maCTRL)/2
+Y <- (ma7DPI - maCTRL)
+png("MAplot_7DPI_vs_CTRL.png")
+smoothScatter(X, Y, main="7DPI vs Control", xlab="(7DPI + CTRL)/2", ylab="(7DPI - CTRL)", sub=Sys.time())
 
-# DY14 v ctrl
-X <- (maDY14 + maCtrl)/2
-Y <- (maDY14 - maCtrl)
-png("MAplot_DY14_vs_ctrl.png")
-smoothScatter(X, Y, main="DY14 vs Control", xlab="(DY14 + CTRL)/2", ylab="(DY14 - CTRL)", sub=Sys.time())
+# 14DPI v CTRL
+X <- (ma14DPI + maCTRL)/2
+Y <- (ma14DPI - maCTRL)
+png("MAplot_14DPI_vs_CTRL.png")
+smoothScatter(X, Y, main="DY14 vs Control", xlab="(14DPI + CTRL)/2", ylab="(14DPI - CTRL)", sub=Sys.time())
 dev.off()
 
-# DY90 v ctrl
-X <- (maDY90 + maCtrl)/2
-Y <- (maDY90 - maCtrl)
-png("MAplot_DY90_vs_ctrl.png")
-smoothScatter(X, Y, main="DY90 vs Control", xlab="(DY90 + CTRL)/2", ylab="(DY190- CTRL)", sub=Sys.time())
+# 90DPI v CTRL
+X <- (ma90DPI + maCTRL)/2
+Y <- (ma90DPI - maCTRL)
+png("MAplot_90DPI_vs_CTRL.png")
+smoothScatter(X, Y, main="90DPI vs Control", xlab="(90DPI + CTRL)/2", ylab="(90DPI- CTRL)", sub=Sys.time())
 dev.off()
 
 
@@ -309,29 +316,50 @@ write.csv(update.csv,file="summarytable.csv",row.names=FALSE)
 
 # Output Each Pairwise Group
 
-X04HR.Ctrl <- subset(update.csv,select=c(1,2:4,65:72))
-X04HR.DY01 <- subset(update.csv,select=c(1,5:7,65:72))
-X04HR.DY03 <- subset(update.csv,select=c(1,8:10,65:72))
-X04HR.DY07 <- subset(update.csv,select=c(1,11:13,65:72))
-X04HR.DY14 <- subset(update.csv,select=c(1,14:16,65:72))
-X04HR.DY90 <- subset(update.csv,select=c(1,17:19,65:72))
+X4HPI.1DPI <- subset(update.csv,select=c(1,5:7,65:72))
+write.csv(X4HPI.1DPI,file="CTRL_v_1DPI.csv",row.names=FALSE)
+X4HPI.3DPI <- subset(update.csv,select=c(1,8:10,65:72))
+write.csv(X4HPI.3DPI,file="CTRL_v_3DPI.csv",row.names=FALSE)
+X4HPI.7DPI <- subset(update.csv,select=c(1,11:13,65:72))
+write.csv(X4HPI.7DPI,file="CTRL_v_7DPI.csv",row.names=FALSE)
+X4HPI.14DPI <- subset(update.csv,select=c(1,14:16,65:72))
+write.csv(X4HPI.14DPI,file="CTRL_v_14DPI.csv",row.names=FALSE)
+X4HPI.90DPI <- subset(update.csv,select=c(1,17:19,65:72))
+write.csv(X4HPI.90DPI,file="CTRL_v_90DPI.csv",row.names=FALSE)
 
-CTRL.DY01 <- subset(update.csv,select=c(1,20:22,65:72))
-CTRL.DY03 <- subset(update.csv,select=c(1,23:25,65:72))
-CTRL.DY07 <- subset(update.csv,select=c(1,26:28,65:72))
-CTRL.DY14 <- subset(update.csv,select=c(1,29:31,65:72))
-CTRL.DY90 <- subset(update.csv,select=c(1,32:34,65:72))
+CTRL.4HPI <- subset(update.csv,select=c(1,2:4,65:72))
+write.csv(CTRL.4HPI,file="CTRL_v_04HR.csv",row.names=FALSE)
+CTRL.1DPI <- subset(update.csv,select=c(1,20:22,65:72))
+write.csv(CTRL.1DPI,file="Ctrl_v_1DPI.csv",row.names=FALSE)
+CTRL.3DPI <- subset(update.csv,select=c(1,23:25,65:72))
+write.csv(CTRL.3DPI,file="Ctrl_v_3DPI.csv",row.names=FALSE)
+CTRL.7DPI <- subset(update.csv,select=c(1,26:28,65:72))
+write.csv(CTRL.7DPI,file="Ctrl_v_7DPI.csv",row.names=FALSE)
+CTRL.14DPI <- subset(update.csv,select=c(1,29:31,65:72))
+write.csv(CTRL.14DPI,file="Ctrl_v_14DPI.csv",row.names=FALSE)
+CTRL.90DPI <- subset(update.csv,select=c(1,32:34,65:72))
+write.csv(CTRL.90DPI,file="Ctrl_v_90DPI.csv",row.names=FALSE)
 
-DY01.DY03 <- subset(update.csv,select=c(1,35:37,65:72))
-DY01.DY07 <- subset(update.csv,select=c(1,38:40,65:72))
-DY01.DY14 <- subset(update.csv,select=c(1,41:43,65:72))
-DY01.DY90 <- subset(update.csv,select=c(1,44:46,65:72))
+X1DPI.3DPI <- subset(update.csv,select=c(1,35:37,65:72))
+write.csv(X1DPI.3DPI,file="1DPI_v_3DPI.csv",row.names=FALSE)
+X1DPI.7DPI <- subset(update.csv,select=c(1,38:40,65:72))
+write.csv(X1DPI.7DPI,file="1DPI_v_7DPI.csv",row.names=FALSE)
+X1DPI.14DPI <- subset(update.csv,select=c(1,41:43,65:72))
+write.csv(X1DPI.14DPI,file="1DPI_v_14DPI.csv",row.names=FALSE)
+X1DPI.90DPI <- subset(update.csv,select=c(1,44:46,65:72))
+write.csv(X1DPI.90DPI,file="1DPI_v_90DPI.csv",row.names=FALSE)
 
-DY03.DY07 <- subset(update.csv,select=c(1,47:49,65:72))
-DY03.DY14 <- subset(update.csv,select=c(1,50:52,65:72))
-DY03.DY90 <- subset(update.csv,select=c(1,53:55,65:72))
+X3DPI.7DPI <- subset(update.csv,select=c(1,47:49,65:72))
+write.csv(X3DPI.7DPI,file="3DPI_v_7DPI.csv",row.names=FALSE)
+X3DPI.14DPI <- subset(update.csv,select=c(1,50:52,65:72))
+write.csv(X3DPI.14DPI,file="3DPI_v_14DPI.csv",row.names=FALSE)
+X3DPI.90DPI <- subset(update.csv,select=c(1,53:55,65:72))
+write.csv(X3DPI.90DPI,file="3DPI_v_90DPI.csv",row.names=FALSE)
 
-DY07.DY14 <- subset(update.csv,select=c(1,56:58,65:72))
-DY07.DY90 <- subset(update.csv,select=c(1,59:61,65:72))
+X7DPI.14DPI <- subset(update.csv,select=c(1,56:58,65:72))
+write.csv(X7DPI.14DPI,file="7DPI_v_14DPI.csv",row.names=FALSE)
+X7DPI.90DPI <- subset(update.csv,select=c(1,59:61,65:72))
+write.csv(X7DPI.90DPI,file="7DPI_v_90DPI.csv",row.names=FALSE)
 
-DY14.DY90 <- subset(update.csv,select=c(1,62:64,65:72))
+X14DPI.90DPI <- subset(update.csv,select=c(1,62:64,65:72))
+write.csv(X14DPI.90DPI,file="14DPI_v_90DPI.csv",row.names=FALSE)

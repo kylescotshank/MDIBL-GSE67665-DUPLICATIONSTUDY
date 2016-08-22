@@ -47,11 +47,11 @@ library(qvalue)
 # Get CEL files from Gene Expression Omnibus
 #############################################################
 
-# download.file(url='http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE67665&format=file',
-#               destfile='GSE67665_RAW.tar', method='curl')
-# # Create RawFiles directory, untar and drop in
-# dir.create("./RawFiles")
-# untar("GSE67665_RAW.tar",exdir="./RawFiles")
+download.file(url='http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE67665&format=file',
+              destfile='GSE67665_RAW.tar', method='curl')
+# Create RawFiles directory, untar and drop in
+dir.create("./RawFiles")
+untar("GSE67665_RAW.tar",exdir="./RawFiles")
 
 # Copy RawFiles out, do a bunch of steps to make them match designFile downstream
 
@@ -301,6 +301,7 @@ stopifnot(all.equal(nrow(annotation), nrow(celDataExnDF)))
 # Merge with Ensembl Biomart Output
 ensembl_output <- read.csv(file="mart_export.txt",head=TRUE,stringsAsFactors=FALSE)
 allResultsAnno<- merge(allResultsAnno, ensembl_output, by.x="ProbeID", by.y="Ensembl.Transcript.ID", all.x=TRUE)
+names(allResultsAnno) = sub("X","",names(allResultsAnno)) 
 
 write.table(allResultsAnno, pairwiseContrastsFile, sep=dataDelimiter, quote=FALSE, row.names=FALSE)
 

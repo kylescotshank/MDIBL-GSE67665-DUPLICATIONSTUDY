@@ -87,7 +87,7 @@ design<- data.frame(Array = sapply(strsplit(file.names, split='_', fixed=TRUE), 
                      Dye = rep(1,length(file.names)),
                      Sample=seq(1:length(file.names)))
 
-write.table(design,"design.dat",sep="\t")
+write.table(design,"design.dat",sep="\t",row.names=FALSE)
 
 # Check number of sample groups - should be 7
 (nSampleGroups <- length(unique(design$Group)))
@@ -368,3 +368,6 @@ write.csv(DPI14.DPI90,file="14DPI_v_90DPI.csv",row.names=FALSE)
 # #############################################################
 # # download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.sdrf.txt","E-GEOD-67665.sdrf.txt")
 # # download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.idf.txt", "E-GEOD-67665.idf.txt")
+
+
+datanorm<-read.table(file="data_norm.txt",header=T)

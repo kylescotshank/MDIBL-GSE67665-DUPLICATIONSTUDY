@@ -83,7 +83,7 @@ install.packages("pd.zebgene10st.dr.ENST.20/",repos=NULL,type="source")
 #############################################################
 
 design<- data.frame(Array = sapply(strsplit(file.names, split='_', fixed=TRUE), function(x) (x[1])),
-                     Group = c(rep("CTRL",3),rep("4HPI",3),rep("1DPI",3),rep("3DPI",3),rep("7DPI",3),rep("14DPI",3),rep("90DPI",3)),
+                     Group = c(rep("DPI00_CTRL",3),rep("DPI00_FOURHPI",3),rep("DPI01",3),rep("DPI03",3),rep("DPI07",3),rep("DPI14",3),rep("DPI90",3)),
                      Dye = rep(1,length(file.names)),
                      Sample=seq(1:length(file.names)))
 
@@ -301,7 +301,7 @@ stopifnot(all.equal(nrow(annotation), nrow(celDataExnDF)))
 # Merge with Ensembl Biomart Output
 ensembl_output <- read.csv(file="mart_export.txt",head=TRUE,stringsAsFactors=FALSE)
 allResultsAnno<- merge(allResultsAnno, ensembl_output, by.x="ProbeID", by.y="Ensembl.Transcript.ID", all.x=TRUE)
-names(allResultsAnno) = sub("X","",names(allResultsAnno)) 
+colnames(allResultsAnno)[128:135]<-c("EnsemblGeneID","AssociatedGeneName","Description","GeneType","ChromsomeName","GeneStartBP","GeneEndBP","Strand")
 
 write.table(allResultsAnno, pairwiseContrastsFile, sep=dataDelimiter, quote=FALSE, row.names=FALSE)
 
@@ -309,65 +309,65 @@ write.table(allResultsAnno, pairwiseContrastsFile, sep=dataDelimiter, quote=FALS
 # Output Annotated Result 
 #############################################################
 
-raw.csv<-read.csv(file="summarytable.csv",head=T,stringsAsFactors=FALSE)
-colnames(raw.csv)[1]<-"ProbeID"
-raw.csv$ProbeID<-strtrim(raw.csv$ProbeID,nchar(raw.csv$ProbeID)-3)
-update.csv<-merge(raw.csv, ensembl_output, by.x="ProbeID", by.y="Ensembl.Transcript.ID", all.x=TRUE)
+update.csv<-allResultsAnno
 write.csv(update.csv,file="summarytable.csv",row.names=FALSE)
 
 # Output Each Pairwise Group
 
-X14DPI.1DPI <- subset(update.csv,select=c(1,2:6,107:114))
-write.csv(X14DPI.1DPI,file="14DPI_v_1DPI.csv",row.names=FALSE)
-X14DPI.3DPI <- subset(update.csv,select=c(1,7:11,107:114))
-write.csv(X14DPI.3DPI,file="14DPI_v_3DPI.csv",row.names=FALSE)
-X14DPI.4HPI <- subset(update.csv,select=c(1,12:16,107:114))
-write.csv(X14DPI.4HPI,file="14HPI_v_4HPI.csv",row.names=FALSE)
-X14DPI.7DPI <- subset(update.csv,select=c(1,17:21,107:114))
-write.csv(X14DPI.7DPI,file="14DPI_v_7DPI.csv",row.names=FALSE)
-X14DPI.90DPI <- subset(update.csv,select=c(1,22:26,107:114))
-write.csv(X14DPI.90DPI,file="14DPI_v_90DPI.csv",row.names=FALSE)
-X14DPI.CTRL <- subset(update.csv,select=c(1,27:31,107:114))
-write.csv(X14DPI.CTRL,file="14DPI_v_CTRL.csv",row.names=FALSE)
+DPI00_CTRL.DPI00_FOURHPI <- subset(update.csv,select=c(1,2:6,107,128:135))
+write.csv(DPI00_CTRL.DPI00_FOURHPI,file="CTRL_v_4HPI.csv",row.names=FALSE)
+DPI00_CTRL.DPI01 <- subset(update.csv,select=c(1,7:11,108,128:135))
+write.csv(DPI00_CTRL.DPI01,file="CTRL_v_1DPI.csv",row.names=FALSE)
+DPI00_CTRL.DPI03 <- subset(update.csv,select=c(1,12:16,109,128:135))
+write.csv(DPI00_CTRL.DPI03,file="CTRL_v_3DPI.csv",row.names=FALSE)
+DPI00_CTRL.DPI07 <- subset(update.csv,select=c(1,17:21,110,128:135))
+write.csv(DPI00_CTRL.DPI07,file="CTRL_v_7DPI.csv",row.names=FALSE)
+DPI00_CTRL.DPI14 <- subset(update.csv,select=c(1,22:26,111,128:135))
+write.csv(DPI00_CTRL.DPI14,file="CTRL_v_14DPI.csv",row.names=FALSE)
+DPI00_CTRL.DPI90 <- subset(update.csv,select=c(1,27:31,112,128:135))
+write.csv(DPI00_CTRL.DPI90,file="CTRL_v_90DPI.csv",row.names=FALSE)
 
-X1DPI.X3DPI <- subset(update.csv,select=c(1,32:36,107:114))
-write.csv(X1DPI.X3DPI,file="1DPI_v_3DPI.csv",row.names=FALSE)
-X1DPI.X4HPI <- subset(update.csv,select=c(1,37:41,107:114))
-write.csv(X1DPI.X4HPI,file="1DPI_v_4HPI.csv",row.names=FALSE)
-X1DPI.7DPI <- subset(update.csv,select=c(1,42:46,107:114))
-write.csv(X1DPI.7DPI,file="1DPI_v_7DPI.csv",row.names=FALSE)
-X1DPI.90DPI <- subset(update.csv,select=c(1,47:51,107:114))
-write.csv(X1DPI.90DPI,file="1DPI_v_90DPI.csv",row.names=FALSE)
-X1DPI.CTRL <- subset(update.csv,select=c(1,52:56,107:114))
-write.csv(X1DPI.CTRL,file="1DPI_v_CTRL.csv",row.names=FALSE)
+DPI00_FOURHPI.DPI01 <- subset(update.csv,select=c(1,32:36,113,128:135))
+write.csv(DPI00_FOURHPI.DPI01 ,file="4HPI_v_1DPI.csv",row.names=FALSE)
+DPI00_FOURHPI.DPI03 <- subset(update.csv,select=c(1,37:41,114,128:135))
+write.csv(DPI00_FOURHPI.DPI03,file="4HPI_v_3DPI.csv",row.names=FALSE)
+DPI00_FOURHPI.DPI07 <- subset(update.csv,select=c(1,42:46,115,128:135))
+write.csv(DPI00_FOURHPI.DPI07,file="4HPI_v_7DPI.csv",row.names=FALSE)
+DPI00_FOURHPI.DPI14 <- subset(update.csv,select=c(1,47:51,116,128:135))
+write.csv(DPI00_FOURHPI.DPI14,file="4HPI_v_14DPI.csv",row.names=FALSE)
+DPI00_FOURHPI.DPI90 <- subset(update.csv,select=c(1,52:56,117,128:135))
+write.csv(DPI00_FOURHPI.DPI90,file="4HPI_v_90DPI.csv",row.names=FALSE)
 
-X3DPI.4HPI <- subset(update.csv,select=c(1,57:61,107:114))
-write.csv(X3DPI.4HPI,file="3DPI_v_3DPI.csv",row.names=FALSE)
-X3DPI.7DPI <- subset(update.csv,select=c(1,62:66,107:114))
-write.csv(X3DPI.7DPI,file="3DPI_v_7DPI.csv",row.names=FALSE)
-X3DPI.90DPI <- subset(update.csv,select=c(1,67:71,107:114))
-write.csv(X3DPI.90DPI,file="3DPI_v_90DPI.csv",row.names=FALSE)
-X3DPI.CTRL <- subset(update.csv,select=c(1,72:76,107:114))
-write.csv(X3DPI.CTRL,file="3DPI_v_CTRL.csv",row.names=FALSE)
+DPI01.DPI03 <- subset(update.csv,select=c(1,57:61,118,128:135))
+write.csv(DPI01.DPI03,file="1DPI_v_3DPI.csv",row.names=FALSE)
+DPI01.DPI07 <- subset(update.csv,select=c(1,62:66,119,128:135))
+write.csv(DPI01.DPI07,file="1DPI_v_7DPI.csv",row.names=FALSE)
+DPI01.DPI14 <- subset(update.csv,select=c(1,67:71,120,128:135))
+write.csv(DPI01.DPI14,file="1DPI_v_14DPI.csv",row.names=FALSE)
+DPI01.DPI90 <- subset(update.csv,select=c(1,72:76,121,128:135))
+write.csv(DPI01.DPI90,file="1DPI_v_90DPI.csv",row.names=FALSE)
 
-X4HPI.7DPI <- subset(update.csv,select=c(1,77:81,107:114))
-write.csv(X4HPI.7DPI,file="4HPI_v_7DPI.csv",row.names=FALSE)
-X4HPI.90DPI <- subset(update.csv,select=c(1,82:86,107:114))
-write.csv(X4HPI.90DPI,file="4HPI_v_90DPI.csv",row.names=FALSE)
-X4HPI.CTRL <- subset(update.csv,select=c(1,87:91,107:114))
-write.csv(X4HPI.CTRL,file="4HPI_v_CTRL.csv",row.names=FALSE)
+DPI03.DPI07 <- subset(update.csv,select=c(1,77:81,122,128:135))
+write.csv(DPI03.DPI07,file="3DPI_v_7DPI.csv",row.names=FALSE)
+DPI03.DPI14 <- subset(update.csv,select=c(1,82:86,123,128:135))
+write.csv(DPI03.DPI14,file="3DPI_v_14DPI.csv",row.names=FALSE)
+DPI03.DPI90 <- subset(update.csv,select=c(1,87:91,124,128:135))
+write.csv(DPI03.DPI90,file="3DPI_v_90DPI.csv",row.names=FALSE)
 
-X7DPI.90DPI <- subset(update.csv,select=c(1,92:96,107:114))
-write.csv(X7DPI.90DPI,file="7DPI_v_90DPI.csv",row.names=FALSE)
-X7DPI.CTRL <- subset(update.csv,select=c(1,97:101,107:114))
-write.csv(X7DPI.CTRL,file="7DPI_v_CTRL.csv",row.names=FALSE)
+DPI07.14DPI <- subset(update.csv,select=c(1,92:96,125,128:135))
+write.csv(DPI07.14DPI,file="7DPI_v_14DPI.csv",row.names=FALSE)
+DPI07.90DPI <- subset(update.csv,select=c(1,97:101,126,128:135))
+write.csv(DPI07.90DPI,file="7DPI_v_90DPI.csv",row.names=FALSE)
 
-X90DPI.CTRL <- subset(update.csv,select=c(1,102:106,107:114))
-write.csv(X90DPI.CTRL,file="90DPI_v_CTRL.csv",row.names=FALSE)
+DPI14.DPI90 <- subset(update.csv,select=c(1,102:106,127,128:135))
+write.csv(DPI14.DPI90,file="14DPI_v_90DPI.csv",row.names=FALSE)
+# 
+# 
+# #############################################################
+# # Fetch .sdrf and .idf files (if necessary)
+# #############################################################
+# # download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.sdrf.txt","E-GEOD-67665.sdrf.txt")
+# # download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.idf.txt", "E-GEOD-67665.idf.txt")
 
 
-#############################################################
-# Fetch .sdrf and .idf files (if necessary)
-#############################################################
-# download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.sdrf.txt","E-GEOD-67665.sdrf.txt")
-# download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.idf.txt", "E-GEOD-67665.idf.txt")
+datanorm<-read.table(file="data_norm.txt",header=T)

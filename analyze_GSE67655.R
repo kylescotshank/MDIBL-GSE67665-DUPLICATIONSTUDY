@@ -368,6 +368,3 @@ write.csv(DPI14.DPI90,file="14DPI_v_90DPI.csv",row.names=FALSE)
 # #############################################################
 # # download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.sdrf.txt","E-GEOD-67665.sdrf.txt")
 # # download.file("http://www.ebi.ac.uk/arrayexpress/files/E-GEOD-67665/E-GEOD-67665.idf.txt", "E-GEOD-67665.idf.txt")
-
-
-datanorm<-read.table(file="data_norm.txt",header=T)
